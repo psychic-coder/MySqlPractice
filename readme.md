@@ -143,3 +143,29 @@ cmd(COUNT)-->
 SELECT COUNT(*) FROM employees;->it gives the number of employees
 SELECT COUNT(DISTINCT dept) FROM employees;-->it will give the number of distinct departments 
 SELECT COUNT(emp_id) FROM employees WHERE desig="Manager";-->we're getting the totalnumber of employees where the desig is of manager,
+
+cmd(GROUP BY)WE group the data on the basis of a particular data:-->
+
+ex:-->the below code will grp the data on the basis of department
+SELECT dept FROM employees GROUP BY dept;
+
+//in this example we're grouping the employees on the basis of department , and we're counting the nuber of employees in each department
+SELECT dept,COUNT(emp_id) FROM employees GROUP BY dept;
+
+cmd(MAX and MIN) from employees:-->
+SELECT MAX(age) FROM employees;-->it will return the max salary
+SELECT MIN(age) FROM employees;
+
+Subqueries:---->
+we're fetching all the details for the employee with the maximum salary
+SELECT emp_id,fname,salar FROM employees WHERE salary=(SELECT MAX(SALARY) FROM employees);
+
+cmd(SUM & AVG):-->
+SELECT SUM(salary) FROM employees;
+SELECT AVG(salary) FROM employees;
+
+we're fetching the total sum of the salaries in each group and we're also counting the number of people in each department 
+SELECT dept,SUM(salary),COUNT(emp_id) FROM employees GROUP BY dept;
+
+
+
