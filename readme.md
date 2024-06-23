@@ -167,5 +167,295 @@ SELECT AVG(salary) FROM employees;
 we're fetching the total sum of the salaries in each group and we're also counting the number of people in each department 
 SELECT dept,SUM(salary),COUNT(emp_id) FROM employees GROUP BY dept;
 
+dataType(DECIMAL)--->
+Ex:-in the below example 5 is the total number of digits including the decimal  and 2 is the digits present after decimal
+DECIMAL keyword-DECIMAL(5,2)
+CREATE TABLE num1(
+    price DECIMAL(5,2)
+);
+
+dataType(FLOAT,DOUBLE)
+FLOAT takes upto total 7 digits ,
+DOUBLE takes upto total 15 digits
+create table num2(
+    f float,
+    d double
+);
+
+dataType(DATE,TIME,DATETIME):--->
+DATE FORMAT-->YYYY-MM-DD FORMAT
+TIME FORMAT--> HH:MM:SS FORMAT
+DATETIME-->"yyyy-mm-dd HH:MM:SS" FORMAT
+
+CREATE TABLE PERSON(
+    D DATE,
+    T TIME,
+    DT DATETIME
+);
+
+CURDATE ,CURTIME, NOW -->functions
+CURDATE()--OUTPUT->YYYY-MM-DD
+CURTIME()--OUTPUT->HH:MM:SS
+NOW()--OUTPUT->YYYY-MM-DD hh:mm:ss
+
+INSERT INTO PERSON(D,T,DT) VALUES(CURDATE(),CURTIME(),NOW());
 
 
+
+Functions for DATE TIME
+DAYNAME,DAYMONTH,DAYOFWEEK
+
+SELECT DAYNAME("2007-02-03");--OUTPUT-->"Saturday"
+SELECT DAYOFMONTH("2007-02-03");--OUTPUT-->3
+SELECT DAYOFWEEK("2007-02-03");--OUTPUT-->7
+
+we can also use the above in the below way:-->
+SELECT DAYNAME(CURDATE());
+SELECT DAYOFMONTH(CURDATE());
+SELECT DAYOFWEEK(CURDATE());
+
+
+SELECT MONTHNAME(CURDATE());--->June
+
+SELECT jt,HOUR(jt) FROM PERSON ;-->HOUR is used for taking only the value of the hour from the time
+SELECT jt,MINUTE(jt) FROM PERSON ;-->MINUTE is used for taking only the value of the MINUTE from the time
+
+DATE_FORMAT()--->IT IS USED TO FORMAT THE DATE
+ex:-%D gives the date of the month,%a gives the weekday and %T dives the time
+DATE_FORMAT(NOW(),"%D %a at %T")-->
+RESULT:21st Tue at 21:20:28
+
+DATE_FORMAT(NOW(),"%m/%d/%y")-->
+RESULT:04/16/23
+
+SELECT jdt,DATE_FORMAT(jdt,"%D %a at %k") FROM person;
+
+DATE_FORMAT(now(),"%H:%i")-->
+output-->RESULT:20:34
+
+DATE_FORMAT(dob,"%r")-->
+output-->RESULT: 08:35:48 PM
+
+function for (DATE MATHS)
+DATEDIFF(expr1,expr2)-->it gives the difference between two datesnitreturns the values in the form of dates
+ex:-->DATEDIFF("2023-04-20","2023-03-15")
+
+
+DATE_ADD(date,INTERVAL expr unit)
+DATE_SUB(date,INTERVAL expr unit)
+ex:-->DATE_ADD("2023-05-01",INTERVAL 1 DAY)
+ex:-->DATE_ADD("2023-05-01",INTERVAL 1 YEAR)
+ex:-->DATE_SUB("2023-05-01",INTERVAL 1 MONTH)
+
+TIMEDIFF(expr1,expr2);
+TIMEDIFF("20:00:00","12:00:00");
+
+
+DEFAULT & ON UPDATE TIMESTAMP
+CREATE TABLE BLOGS(
+    id INT PRIMARY KEY,
+    text VARCHAR(150),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,//this will work when we create the data
+    updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP //this will work when the data will be updated
+);
+
+UPDATE BLOGS 
+SET text="fuheabub"
+WHERE id="101";
+
+CHAR dataType is mostly preferred when we want to keep the number of characters to be the same
+
+SELECT DATE_FORMAT(NOW(),"%M %D at %T");--output-->
+April 21st at 22:42:50;
+
+Relational Operators
+>,<,>=,<=,!=,=
+
+Logical Operators
+AND , OR
+
+ex:->
+SELECT * FROM Employees WHERE salary=25000 AND dept="Loan";
+SELECT * FROM Employees WHERE salary=25000 OR dept="Loan";
+
+Use of IN & NOT IN 
+ex:-->in this example if in the dept if any of the value is matched we get the result
+SELECT * FROM employees 
+WHERE dept IN("Account","Cash","Loan");
+
+ex:-->in the below example we're asking for all the data except Account,Cash and Loan
+SELECT * FROM employees 
+WHERE dept NOT IN("Account","Cash","Loan");
+
+cmd(BETWEEN keyword)-->
+its similar to 
+SELECT * FROM employess WHERE salary>25000 AND salary<65000;
+Between works in the similar way
+SELECT * FROM employess WHERE salary BETWEEN 23000 AND 40000;
+
+cmd (CASE statement)
+ex1:-->in the below code we're fetching fname,salary and an extra column in the table called Salary Category in which we're marking each user "Higher Salary" and "Lower Salary" in the table on the basis of the salary greater then equal to 50000
+
+SELECT fname,salary,
+        CASE
+        WHEN salary>=50000 THEN "Higher Salary"
+        ELSE "Low Salary"
+        END 
+        AS "Salary Category"
+        FROM employees;
+
+ ex2:-->
+ ELECT fname,salary,
+        CASE
+        WHEN salary>=50000 THEN "Higher Salary"
+        WHEN salary>=30000 AND salary<50000 THEN "Mid Salary"
+        ELSE "Low Salary"
+        END 
+        AS "Salary Category"
+        FROM employees       
+
+
+cmd(IS):-->
+In this code we're searching for data's where the coloumn jt has a null values
+SELECT * FROM person WHERE jt IS NULL
+
+cmd(NOT LIKE)-->
+ex:-in th below code we're are looking for the names not starting with A
+SELECT * FROM employees WHERE fname NOT LIKE "A%";
+
+cmd(UNIQUE)--->
+it is used to make the data unique in a field
+ex:-->
+CREATE TABLE contact(
+    mob INT UNIQUE
+);
+
+cmd(CHECK)-->it is used to check on the basis of the constraint 
+ex:-->in the below code we're checking whether the value of the mob we're entering is equal to 10 or not
+CREATE TABLE contact1(
+    mob VARCHAR(15) UNIQUE CHECK (LENGTH(mob)=10)
+);
+
+
+NAMED CONSTRAINT
+
+ex:-->in the below example we gave a name to the constraint "mob_no_less_than_10digits" and then we give the condition
+CREATE TABLE contacts(
+    name VARCHAR(50),
+    mob VARCHAR(15) UNIQUE,
+    CONSTRAINT mob_no_less_than_10digits CHECK (LENGTH(mob)>=10)
+);
+
+
+cmd(ALTER)--->its is used to alter the data or coloumn in a table
+EX:->
+ALTER TABLE contacts
+ADD COLUMN city VARCHAR(50);
+
+Deleting a coloumn
+ex:->
+ALTER TABLE contacts
+DROP COLUMN city;
+
+Changing the name of the coloumn
+ex:->
+ALTER TABLE contacts
+RENAME COLUMN emp_id TO id;
+
+Renaming a table
+ex:-->
+ALTER TABLE contacts
+RENAME TO mycontacts;
+
+Changing the data type of a coloumn in a table
+ex:->
+ALTER TABLE contacts
+MODIFY mob VARCHAR(15) DEFAULT "unknown"; 
+
+JOINS in Table
+Types of Relationship
+1:1-->1 row in the first table is linked to exactly one row in the second table
+1:many-->1 row in the first table is linked to more than 1 row in the next tablw
+many:many-->more than one row in the first table is linked to more than 1 row in the next table
+
+ex:-->in the below code the customers table is connected to the orders table using the foreign key
+
+CREATE TABLE customers(
+    cust_id AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50),
+    email VARCHAR(50)
+);
+
+CREATE TABLE orders(
+    order_id INT AUTO_INCREMENT PRIMARY KEY,
+    date DATE DEFAULT CURRENT_TIMESTAMP,
+    amount DECIMAL(10,2),
+    cust_id INT,
+    FOREIGN KEY (cust_id) REFERENCES customers(cust_id)
+);
+
+INSERT INTO customers(name,email) VALUES ("Hello","rohit@gmail.com");
+INSERT INTO orders(amount,cust_id) VALUES (22000,1);//we're connecting this row to one row of the table one
+
+JOIN operation is used to combine rows from two or more tables based on a related column between them.
+Types of JOIN
+
+Cross Join-->every row in one table is connected with every row from another table
+SELECT * FROM customers,orders;
+
+Inner Join-->returns only the rows where there is a match between the specified coloumns in both the left (or first) and right (or second) tables.
+ex:->
+SELECT * FROM customers 
+INNER JOIN orders 
+ON orders.cust_id=customers.cust_id;
+
+ex:-->in the below code we're grouping the users on the basis of their name and getting the amount of purchases they have made
+SELECT name,SUM(amount) FROM customers 
+INNER JOIN orders 
+ON orders.cust_id=customers.cust_id;
+GROUP BY name;
+
+Left Join-->Returns all rows from the left table and the matching rows from the right table, 
+ex:-->customers is the left table and orders is the right table
+SELECT * FROM customers
+LEFT JOIN orders
+ON orders.cust_id=customers.cust_id;
+
+ex:-->customers is the left table and orders is the right table
+SELECT name,SUM(amount) FROM customers
+LEFT JOIN orders
+ON orders.cust_id=customers.cust_id GROUP BY name;
+
+ex:-->customers is the left table and orders is the right table
+and we also added the ifnull condition that if the amount is null we make the amount value will be 0
+SELECT name,IFNULL(SUM(amount),0) FROM customers
+LEFT JOIN orders
+ON orders.cust_id=customers.cust_id GROUP BY name;
+
+
+Right Join-->Returns all rows from the right table and the matching rows from the left table
+ex:-->in the below customers is the right table
+SELECT * FROM orders 
+RIGHT JOIN customers
+ON orders.cust_id=customers.cust_id;
+
+cmd(ON DELETE CASCADE)-->
+it is used in a foreign key constraint to automatically delete rows in a child table when the corresponding rows in the parent table are deleted.
+
+CREATE TABLE orders(
+    order_id INT AUTO_INCREMENT PRIMARY KEY,
+    date DATE DEFAULT CURRENT_TIMESTAMP,
+    amount DECIMAL(10,2),
+    cust_id INT,
+    FOREIGN KEY (cust_id) REFERENCES customers(cust_id) ON DELETE CASCADE
+);
+
+ex:--> in the below case we are using the inner join with case in which we are also creating a new column of remark  on the basis of the values if ratings
+select author_name,ratings,
+CASE
+    WHEN ratings>=3 THEN "Good"
+    ELSE "Average" 
+END as remark
+from authors
+inner join books
+on books.au_id=authors.author_id
