@@ -459,3 +459,207 @@ END as remark
 from authors
 inner join books
 on books.au_id=authors.author_id
+
+Many-Many relationship:-
+
+ex:-->we created two tables one is for courses and other one is for students , then we created a third table called student_course which i used to join the other two;
+
+CREATE TABLE students(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    student_name VARCHAR(20)
+);
+CREATE TABLE courses(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    course_name VARCHAR(20),
+    fees INT
+);
+CREATE TABLE student_course(
+    student_id INT,
+    course_id INT,
+    FOREIGN KEY (student_id) REFERENCES students(id);
+    FOREIGN KEY (course_id) REFERENCES courses(id);
+);
+Now for many to many we use the below relationship :-->
+SELECT student_name , course_name FROM students
+JOIN
+ student_course ON student_course.student_id=students.id
+JOIN
+ courses ON student_course.course_id=courses.id;
+
+ cmd(VIEW)-->
+//a view is a virtual table that provides a way to represent the result of a SQL query as if it were a real table. Views allow you to encapsulate complex queries and make them easier to reuse and manage
+
+ex:-View creates an extra table of the name inst_info which is the result of the below query
+
+
+ CREATE VIEW inst_info AS
+ SELECT student_name , course_name,fees FROM students
+JOIN 
+     student_course ON student_course.student_id=students.id
+JOIN 
+     courses ON student_course.course_id=courses.id;
+
+cmd(HAVING CLAUSE)-->
+
+in the below code we used HAVING in place of the WHERE , as we cannot use WHERE  with GROUP BY
+ex:-
+SELECT student_name , SUM(fees) FROM insta_info GROUP BY student_name HAVING SUM(fees)>10000
+
+cmd(GROUP BY ROLL UP)
+the roll us provides adds another row with the total sum of the fees coloumn , we can use rollup with count, sum ,avg
+SELECT IFNULL(student_name,"TOTAL"), SUM(fees) FROM inst_info GROUP BY student_name WITH ROLLUP;
+
+cmd(STORED ROUTINE)-->
+An SQL statement or a set of SQL Statement that can be stored on a database server which can be called number of times
+a stored routine is a set of SQL statements that can be stored in the database and executed as a unit. 
+Types:
+1)STORED Procedure-->it performs operations but do not return a value , it contains a series of SQL statements and procedural logic and used for performing actions like modification , transaction control, and executing sequences of statements
+ex:->
+
+<!-- we can drop if exist already -->
+DROP PROCEDURE IF EXISTS p_name;
+
+<!-- Temp changing delimiter -->
+DELIMITER $$  //in this code we made $$ our delimeter in place of semicolon
+
+CREATE PROCEDURE p_name() //p_name is the name of the procedure
+BEGIN
+    SELECT * FROM employees
+    LIMIT 10;
+END$$ //once we reach the END then the code will run as we have changed the delimeter to $$
+
+<!-- Again changing delimeter -->
+DELIMETER ; //we again changed the delimeter back to semicolon
+
+we can run the stored_procedure by either using --> CALL pname() //pname is the name of the procedure
+
+Argument passing in stored procedure:-->
+
+ex:-->in the below exmample we have taken p_fname as the input
+DELIMETER $$
+CREATE PROCEDURE get_empid (IN p_fname VARCHAR(50) )
+BEGIN
+    SELECT emp_id FROM employees
+    WHERE fname=p_fname;
+END$$
+DELIMETER ;
+// WE can call the above db by " call get_empid("rohit") " 
+
+Returning Output in a Variable in STORED PROCEDURE
+
+EX:->in the below code we're returning the value in the form of variable "p_sum" , we wrote INTO which means the value of SUM(SALARY) is to be stored in p_sum;
+DELIMETER $$
+CREATE PROCEDURE get_sum(IN p_fname VARCHAR(50),OUT p_sum DECIMAL(10,2))
+BEGIN
+ SELECT SUM(Salary) INTO p_sum FROM employees
+ WHERE fname=p_fname;
+END$$
+DELIMETER ;
+
+//how to execute the above code
+SET @emp_sum=0;//we created a variable named emp_sum, 
+call get_sum("Rohit",@emp_sum);
+SELECT @emp_sum;//display the emp_sum;
+
+2)User defined Functions
+
+
+ex:-->in the below code we're fetching the data of the user with the highest salary
+to run the below code we'll write "SELECT db_name.get_sum() "
+DELIMETER $$
+
+CREATE FUNCTION get_sum(p_fname VARCHAR(50)) RETURNS VARCHAR(50)
+DETERMINISTIC NO SQL READS SQL DATA
+BEGIN 
+    DECLARE v_max INT;
+    DECLARE v_name VARCHAR(50);
+
+    SELECT MAX(SALARY) INTO v_max FROM employees;
+    SELECT fname INTO v_name FROM employees WHERE salary=v_max;
+
+    return v_name;
+END$$
+
+DELIMETER ;
+
+cmd(WINDOW functions)-->it is used to perform calculations across a set of rows related to the current row
+defined by OVER() clause.
+
+ex:-->
+//it will give the sum of the salaries but it will return the number of times of each row ,
+SELECT SUM(salary) OVER() AS sum_salary FROM employees;
+
+//we can even give multiple data in OVER()
+SELECT 
+emp_id,
+fname,
+salary,
+SUM(salary) OVER(ORDER BY emp_id) AS sum_salary 
+FROM employees;
+
+//we are trying to get the sum of each department 
+SELECT 
+emp_id,
+fname,
+salary,
+SUM(salary) OVER(PARTITION BY dept) AS sum_salary 
+FROM employees;
+
+
+SELECT 
+emp_id,
+fname,
+salary,
+MAX(salary) OVER(PARTITION BY dept) AS sum_salary 
+FROM employees;
+
+other functions such as ---> ROW_NUMBER(),RANK(),DENSE_RANK(),LAG(),LEAD()
+
+
+ex:-->in the below code we're are sorting the salry on the basis of row number  
+SELECT
+ROW_NUMBER()  OVER(ORDER BY salary) AS row_no,
+emp_id,
+fname,
+salary,
+FROM employees;
+
+ex:-->we're ranking the data on the basis of salary
+SELECT
+emp_id,
+fname,
+salary,
+RANK() OVER(ORDER BY salary) AS rank_sal,
+FROM employees;
+
+
+SELECT
+emp_id,
+fname,
+salary,
+DENSE_RANK() OVER(ORDER BY salary) AS rank_sal,
+FROM employees;
+
+ex:->lag_sal displays the the salary value present before the current salary value
+SELECT
+emp_id,
+fname,
+salary,
+LAG(salary) OVER() AS lag_sal,
+FROM employees;
+
+ex:->lead_sal displays the the salary value present ahead the current salary value
+SELECT
+emp_id,
+fname,
+salary,
+LEAD(salary) OVER() AS lead_sal,
+FROM employees;
+
+SELECT
+emp_id,
+fname,
+salary,
+salary - LAG(salary) OVER(order by salary desc) AS diff_sal,
+FROM employees;
+
